@@ -717,7 +717,6 @@
     <string name="enable_return_youtube_dislike_summary">Gunakan API ReturnYouTubeDislike untuk menampilkan jumlah dislike untuk video. Ini hanya bekerja untuk video YouTube.\n<b>PERHATIAN: Alamat IP Anda akan terlihat oleh API. Gunakan dengan risiko Anda sendiri!</b></string>
     <string name="playback_tempo_step">Langkah tempo</string>
     <string name="progressive_load_interval_exoplayer_default">Default ExoPlayer</string>
-    <string name="progressive_load_interval_summary">Ubah ukuran interval pemuatan (saat ini %s). Nilai yang rendah mungkin dapat membuat pemuatan video awal lebih cepat. Perubahan membutuhkan pemutar dimulai ulang</string>
     <string name="loading_stream_details">Memuat detail stream…</string>
     <string name="streams_notifications_interval_title">Frekuensi pemeriksaan</string>
     <string name="streams_notifications_network_title">Dibutuhkan koneksi jaringan</string>
