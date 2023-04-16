@@ -94,7 +94,7 @@ class SubscriptionManager(context: Context) {
     fun updateFromInfo(subscriptionId: Long, info: Info) {
         val subscriptionEntity = subscriptionTable.getSubscription(subscriptionId)
 
-        if (info is FeedInfo) {
+        if (info is FeedInfo && info.name.isNotEmpty()) {
             subscriptionEntity.name = info.name
         } else if (info is ChannelInfo) {
             subscriptionEntity.setData(

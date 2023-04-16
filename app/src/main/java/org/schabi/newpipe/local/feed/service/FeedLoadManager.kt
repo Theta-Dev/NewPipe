@@ -63,6 +63,10 @@ class FeedLoadManager(private val context: Context) {
             context.getString(R.string.feed_use_dedicated_fetch_method_key),
             false
         )
+        val useSlowFeed = defaultSharedPreferences.getBoolean(
+            context.getString(R.string.feed_use_slow_feed_key),
+            false
+        )
 
         val outdatedThreshold = if (ignoreOutdatedThreshold) {
             OffsetDateTime.now(ZoneOffset.UTC)
@@ -80,7 +84,9 @@ class FeedLoadManager(private val context: Context) {
          * subscriptions which have not been updated within the feed updated threshold
          */
         val outdatedSubscriptions = when (groupId) {
-            FeedGroupEntity.GROUP_ALL_ID -> feedDatabaseManager.outdatedSubscriptions(outdatedThreshold)
+            FeedGroupEntity.GROUP_ALL_ID -> feedDatabaseManager.outdatedSubscriptions(
+                outdatedThreshold
+            )
             GROUP_NOTIFICATION_ENABLED -> feedDatabaseManager.outdatedSubscriptionsWithNotificationMode(
                 outdatedThreshold, NotificationMode.ENABLED
             )
@@ -120,7 +126,19 @@ class FeedLoadManager(private val context: Context) {
                     var streams: List<StreamInfoItem>? = null
                     val errors = ArrayList<Throwable>()
 
-                    if (useFeedExtractor) {
+                    if (useSlowFeed) {
+                        NewPipe.getService(subscriptionEntity.serviceId)
+                            .getSlowFeedExtractor(subscriptionEntity.url)
+                            ?.also { feedExtractor ->
+                                // the user wants to use a feed extractor and there is one, use it
+                                val feedInfo = FeedInfo.getInfo(feedExtractor)
+                                errors.addAll(feedInfo.errors)
+                                originalInfo = feedInfo
+                                streams = feedInfo.relatedItems
+                            }
+                    }
+
+                    if (originalInfo == null && useFeedExtractor) {
                         NewPipe.getService(subscriptionEntity.serviceId)
                             .getFeedExtractor(subscriptionEntity.url)
                             ?.also { feedExtractor ->
@@ -208,7 +226,12 @@ class FeedLoadManager(private val context: Context) {
     }
 
     private fun broadcastProgress() {
-        FeedEventManager.postEvent(FeedEventManager.Event.ProgressEvent(currentProgress.get(), maxProgress.get()))
+        FeedEventManager.postEvent(
+            FeedEventManager.Event.ProgressEvent(
+                currentProgress.get(),
+                maxProgress.get()
+            )
+        )
     }
 
     /**
